@@ -56,7 +56,7 @@ code{font-family:var(--f-mono);font-size:.92em}
 .field{width:100%;background:var(--void);border:1px solid var(--line);border-radius:4px;color:var(--fg);padding:8px 10px;font:inherit}
 .field:focus{border-color:var(--kali);outline:none}
 .loginbtn{margin-top:14px;width:100%;padding:9px;border-radius:4px;background:var(--kali);color:var(--on-accent);font-weight:700;font-family:var(--f-mono);letter-spacing:.08em}
-.loginbox .note{margin-top:12px;font-size:11px;color:var(--dim)}
+.loginbox .note{margin-top:12px;font-size:13px;color:var(--fg);font-weight:600}
 .loginmeta{position:absolute;z-index:1;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:8px 14px;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
 
 /* ---------- PANEL ---------- */
@@ -211,10 +211,10 @@ Press enter to boot the selected OS, or tap an entry.
     <div class="avatar" aria-hidden="true">SD</div>
     <h1>Sai Praveen Danda</h1>
     <div class="sub">Cybersecurity Analyst</div>
-    <label for="lpass">Password</label>
-    <input class="field" id="lpass" type="password" placeholder="any password works">
-    <button class="loginbtn" id="loginbtn" type="button">Log In</button>
-    <div class="note">Portfolio login. Nothing you type is stored or sent.</div>
+    <label for="lpass">What's the brocode?</label>
+    <input class="field" id="lpass" type="password" placeholder="enter brocode">
+    <button class="loginbtn" id="loginbtn" type="button">Let Me In</button>
+    <div class="note" id="loginmsg">Authentication required. You get 2 guesses.</div>
   </form>
 </div>
 
@@ -366,9 +366,47 @@ async function toSyslog(){
 }
 
 /* ===== LOGIN ===== */
+let loginAttempts=0;
+let loginLocked=false;
+const portfolioPassword='trustmebro';
 function doLogin(e){
   if(e) e.preventDefault();
-  toDesktop();
+  if(loginLocked)return;
+  const input=$('#lpass');
+  const msg=$('#loginmsg');
+  const guess=input.value.trim().toLowerCase();
+
+  if(!guess){
+    msg.textContent='[ERROR] Bro... you didn\'t even type anything.';
+    input.focus();
+    return;
+  }
+
+  if(guess===portfolioPassword){
+    loginLocked=true;
+    msg.textContent='[ACCESS GRANTED] You know the brocode. 🤝';
+    setTimeout(toDesktop,2500);
+    return;
+  }
+
+  if(guess==='password'){
+    msg.textContent='[SECURITY+] Seriously? I expected better.';
+  }else if(guess==='admin'){
+    msg.textContent='[WARNING] Nice try, script kiddie.';
+  }else if(guess==='sudo'){
+    msg.textContent='sai is not in the sudoers file. This incident will be reported.';
+  }
+
+  loginAttempts++;
+  input.value='';
+  if(loginAttempts===1){
+    setTimeout(()=>{if(!loginLocked)msg.textContent='[ACCESS DENIED] Nope. One more shot, bro.';}, 2500);
+    input.focus();
+  }else{
+    loginLocked=true;
+    msg.innerHTML='[ACCESS DENIED] Yeah... you\'re not getting this.<br>Alright, I\'ll let you in anyway.';
+    setTimeout(toDesktop,2500);
+  }
 }
 $('#loginform').addEventListener('submit',doLogin);
 $('#loginbtn').addEventListener('click',doLogin);
