@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Sai Praveen Danda, Cybersecurity Analyst. Interactive Kali-style portfolio.">
+<title>Sai Praveen Danda Portfolio</title>
+<style>[hidden]{display:none!important} img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&family=Fira+Code:wght@400;500;600&display=swap">
+<style>
+/* Layout: hacker-themed Kali desktop — GRUB → systemd log → login → top panel + dark windows over animated code rain, with a live monitor widget */
+:root{
+  color-scheme: dark;
+  --void:#020503;        /* grub / console */
+  --wall:#020604;        /* wallpaper base */
+  --panel:#060c08;       /* top panel */
+  --win:#08110c;         /* window surface */
+  --win2:#0f1c14;        /* title bar / raised */
+  --line:#1c3626;
+  --fg:#c9f2d8; --dim:#5f8f72;
+  --kali:#1fe88a;        /* accent: phosphor green */
+  --on-accent:#021208;
+  --ok:#3fc56b; --warn:#e5b53f; --err:#ef5350; --cyan:#4fc3e8;
+  --f-ui:"Cantarell", "Noto Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"Fira Code", ui-monospace, "DejaVu Sans Mono", Menlo, monospace;
+}
+html,body{height:100%}
+body{margin:0;background:var(--void);color:var(--fg);font:13px/1.45 var(--f-ui);overflow:hidden}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--kali);outline-offset:1px}
+code{font-family:var(--f-mono);font-size:.92em}
+
+/* ---------- GRUB ---------- */
+#grub{position:fixed;inset:0;background:var(--void);color:#c9c9c9;font:15px/1.5 var(--f-mono);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+#grub .head{margin-bottom:14px;color:#aaa}
+#grubmenu{list-style:none;margin:0;padding:6px 0;width:min(640px,100%);border:1px solid #9a9a9a}
+#grubmenu li{padding:1px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+#grubmenu li[aria-selected=true]{background:#c9c9c9;color:#000}
+#grub .foot{width:min(640px,100%);margin-top:12px;color:#9a9a9a;font-size:13px;white-space:pre-wrap}
+
+/* ---------- SYSTEMD LOG ---------- */
+#syslog{position:fixed;inset:0;background:var(--void);color:#cfcfcf;font:13px/1.45 var(--f-mono);padding:12px 16px;overflow:hidden;cursor:pointer}
+#syslog .ok{color:var(--ok)} #syslog .w{color:var(--warn)}
+#syslog .skip{position:absolute;right:16px;bottom:12px;color:#666}
+
+/* ---------- LOGIN ---------- */
+#login{position:fixed;inset:0;display:grid;place-items:center;padding:16px;background:var(--wall)}
+.wallpaper{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none}
+.loginbox{position:relative;z-index:1;width:min(340px,100%);background:rgba(4,12,7,.9);border:1px solid var(--line);border-radius:8px;padding:28px 24px 22px;text-align:center;box-shadow:0 0 0 1px rgba(31,232,138,.15),0 0 40px rgba(31,232,138,.12),0 20px 60px rgba(0,0,0,.6)}
+.avatar{width:72px;height:72px;margin:0 auto 10px;border-radius:50%;background:var(--win2);display:grid;place-items:center;border:2px solid var(--kali);font:700 26px var(--f-ui);color:var(--fg)}
+.loginbox h1{font:600 17px var(--f-mono);margin:0;color:var(--kali);text-shadow:0 0 10px rgba(31,232,138,.45)}
+.loginbox .sub{color:var(--dim);font-size:12px;margin:2px 0 18px}
+.loginbox label{display:block;text-align:left;font-size:12px;color:var(--dim);margin:0 0 4px}
+.field{width:100%;background:var(--void);border:1px solid var(--line);border-radius:4px;color:var(--fg);padding:8px 10px;font:inherit}
+.field:focus{border-color:var(--kali);outline:none}
+.loginbtn{margin-top:14px;width:100%;padding:9px;border-radius:4px;background:var(--kali);color:var(--on-accent);font-weight:700;font-family:var(--f-mono);letter-spacing:.08em}
+.loginbox .note{margin-top:12px;font-size:11px;color:var(--dim)}
+.loginmeta{position:absolute;z-index:1;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:8px 14px;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+
+/* ---------- PANEL ---------- */
+#panel{position:fixed;top:0;left:0;right:0;height:30px;padding-top:env(safe-area-inset-top,0px);background:var(--panel);border-bottom:1px solid #000;display:flex;align-items:center;gap:4px;padding-inline:4px;z-index:9000;font-size:12px}
+.pbtn{height:24px;padding:0 8px;border-radius:3px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pbtn:hover,.pbtn.on{background:var(--win2)}
+.sep{width:1px;height:16px;background:var(--line);margin:0 2px}
+.ws{display:flex;gap:2px}
+.ws button{width:22px;height:18px;border:1px solid var(--line);border-radius:2px;font-size:10px;color:var(--dim)}
+.ws button.on{background:var(--kali);border-color:var(--kali);color:var(--on-accent)}
+#tasks{flex:1;display:flex;gap:2px;min-width:0;overflow:hidden}
+.task{flex:0 1 170px;min-width:36px;height:24px;padding:0 8px;border-radius:3px;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim);border-bottom:2px solid transparent}
+.task.on{background:var(--win2);color:var(--fg);border-bottom-color:var(--kali)}
+.tray{display:flex;align-items:center;gap:10px;padding:0 6px;color:var(--fg);font-variant-numeric:tabular-nums}
+.tray svg{width:14px;height:14px;fill:var(--fg)}
+
+/* ---------- APPS MENU ---------- */
+#menu{position:fixed;top:30px;left:4px;width:min(520px,calc(100vw - 8px));max-height:calc(100% - 40px);background:var(--win);border:1px solid var(--line);border-radius:0 0 6px 6px;box-shadow:0 12px 40px rgba(0,0,0,.6);z-index:9500;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+#menu .search{grid-column:1/-1;padding:8px;border-bottom:1px solid var(--line)}
+#menu .cats,#menu .items{list-style:none;margin:0;padding:4px;overflow:auto;max-height:60vh}
+#menu .cats{border-right:1px solid var(--line)}
+#menu li button{width:100%;text-align:left;padding:6px 8px;border-radius:3px;display:flex;gap:8px;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#menu li button:hover,#menu li button.on{background:var(--kali);color:var(--on-accent)}
+#menu .num{color:var(--dim);font-family:var(--f-mono);font-size:11px;min-width:18px}
+#menu li button:hover .num,#menu li button.on .num{color:var(--on-accent)}
+#menu .items .d{color:var(--dim);font-size:11px;margin-left:auto;overflow:hidden;text-overflow:ellipsis}
+#menu .items button:hover .d{color:var(--on-accent)}
+#menu .user{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+
+/* ---------- DESKTOP ---------- */
+#desktop{position:fixed;inset:30px 0 0 0;background:var(--wall);overflow:hidden}
+.icons{position:absolute;top:12px;left:8px;display:grid;grid-auto-flow:column;grid-template-rows:repeat(auto-fill,84px);gap:6px;height:calc(100% - 24px);z-index:1}
+.ico{width:84px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 2px;border-radius:4px;color:var(--fg);font-size:11.5px;text-align:center;text-shadow:0 1px 3px #000}
+.ico svg{width:38px;height:38px}
+.ico:hover{background:rgba(31,232,138,.14)}
+.ico.sel{background:rgba(31,232,138,.28)}
+.brand{position:absolute;right:28px;bottom:24px;text-align:right;pointer-events:none;color:rgba(31,232,138,.28);text-shadow:0 0 12px rgba(31,232,138,.35)}
+.brand b{display:block;font:600 40px/1 var(--f-mono);letter-spacing:-1px}
+.brand span{font:13px var(--f-mono)}
+
+#desktop::after,#login::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px),radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65))}
+.conky{position:absolute;top:14px;right:22px;width:270px;z-index:1;font:11px/1.55 var(--f-mono);color:var(--dim);background:rgba(2,8,4,.55);border:1px solid var(--line);border-radius:4px;padding:10px 12px;pointer-events:none;font-variant-numeric:tabular-nums}
+.conky .h{color:var(--kali);font-weight:600;letter-spacing:.06em;text-shadow:0 0 8px rgba(31,232,138,.5)}
+.conky .r{display:flex;justify-content:space-between;gap:8px}
+.conky .r b{color:var(--fg);font-weight:500}
+.meter{height:5px;background:#0b1a11;border:1px solid var(--line);margin:2px 0 5px}
+.meter i{display:block;height:100%;background:var(--kali);box-shadow:0 0 6px var(--kali);transition:width .8s}
+.conky .log{margin-top:6px;border-top:1px dashed var(--line);padding-top:6px;height:110px;overflow:hidden}
+.conky .log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conky .ok{color:var(--kali)} .conky .w{color:var(--warn)} .conky .e{color:var(--err)}
+.glitch{animation:glitch 6s infinite steps(1)}
+@keyframes glitch{0%,92%,100%{transform:none;opacity:1}93%{transform:translate(2px,-1px);opacity:.7}95%{transform:translate(-2px,1px)}97%{opacity:.85}}
+
+/* ---------- WINDOWS ---------- */
+.win{position:absolute;display:flex;flex-direction:column;background:var(--win);border:1px solid var(--line);border-radius:6px;box-shadow:0 16px 50px rgba(0,0,0,.55);min-width:240px;max-width:100%;overflow:hidden}
+.win.inactive{box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.win.inactive .tb{color:var(--dim)}
+.tb{height:30px;flex:none;display:flex;align-items:center;gap:6px;padding:0 6px 0 10px;background:var(--win2);font-size:12.5px;font-weight:700;cursor:move;user-select:none;touch-action:none}
+.tb .t{flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb .ti{width:14px;height:14px}
+.wb{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:var(--dim)}
+.wb:hover{background:var(--line);color:var(--fg)}
+.wb.x:hover{background:var(--err);color:#fff}
+.wb svg{width:10px;height:10px;stroke:currentColor;stroke-width:1.6;fill:none}
+.tool-bar{display:flex;gap:14px;padding:4px 10px;font-size:12px;color:var(--dim);border-bottom:1px solid var(--line)}
+.wbody{flex:1;min-height:0;overflow:auto;padding:14px 16px}
+.sbar{flex:none;display:flex;gap:14px;padding:3px 10px;font-size:11px;color:var(--dim);border-top:1px solid var(--line)}
+
+/* content */
+.about h2{font-size:22px;margin:0}
+.about .role{color:var(--kali);font-size:12.5px;margin:2px 0 12px}
+.about p{max-width:62ch;margin:0 0 10px;color:#c6ccd8}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12px;margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+.kv dt{color:var(--dim);font-family:var(--f-mono);font-size:11px;padding-top:1px}
+.kv dd{margin:0}
+.sec{margin:0 0 16px}
+.sec h3{font:600 13px var(--f-mono);color:var(--kali);margin:0 0 6px}
+.sec h3::before{content:"# ";color:var(--dim)}
+.sec h4{font-size:11.5px;font-weight:700;color:var(--dim);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.06em}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font:11px/1.6 var(--f-mono);padding:0 7px;border:1px solid var(--line);border-radius:3px;background:var(--void);white-space:nowrap}
+.job{margin:0 0 16px;padding-left:12px;border-left:2px solid var(--line)}
+.job:first-child{border-left-color:var(--kali)}
+.job .jh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px}
+.job b{font-size:13.5px}
+.meta{font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+.job ul{margin:6px 0 0;padding-left:16px;max-width:72ch;color:#c6ccd8}
+.job li{margin:3px 0}
+.tabs{flex:none;display:flex;gap:2px;padding:6px 8px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{padding:5px 10px;border-radius:4px 4px 0 0;font-size:12px;color:var(--dim);white-space:nowrap;border:1px solid transparent;border-bottom:0}
+.tab[aria-selected=true]{background:var(--win);color:var(--fg);border-color:var(--line);margin-bottom:-1px;box-shadow:inset 0 2px var(--kali)}
+.tool{display:grid;grid-template-columns:minmax(120px,auto) 1fr;gap:2px 14px;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(50,58,74,.6)}
+.tool code{color:var(--ok)}
+.tool span{color:#c6ccd8}
+table.feed{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+table.feed th{text-align:left;color:var(--dim);font-weight:400;padding:4px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--win)}
+table.feed td{padding:5px 8px;border-bottom:1px solid rgba(50,58,74,.6);white-space:nowrap}
+.sev{display:inline-block;min-width:66px;text-align:center;font:600 10px/1.7 var(--f-mono);border-radius:3px;letter-spacing:.04em}
+.sev.c{background:#5c1414;color:#ffb4b4}.sev.h{background:#5a2a12;color:#ffc59a}.sev.m{background:#4f4210;color:#ffe08a}.sev.l{background:#0f2e1c;color:#9de3b4}
+.example{font-size:11.5px;color:var(--dim);margin:0 0 8px}
+.empty{color:var(--dim);text-align:center;padding:34px 0;font-size:12.5px}
+pre.note{margin:0;font:12px/1.6 var(--f-mono);white-space:pre-wrap;color:#c6ccd8}
+
+/* terminal */
+.term{flex:1;min-height:0;overflow:auto;background:#010402;padding:8px 10px;font:12.5px/1.45 var(--f-mono);color:#e6e6e6;cursor:text}
+.term .out div{white-space:pre-wrap;word-break:break-word}
+.p1{color:var(--kali)} .pu{color:var(--err);font-weight:600} .pd{color:var(--fg);font-weight:600} .ps{color:var(--kali)}
+.c-ok{color:var(--ok)} .c-er{color:var(--err)} .c-dim{color:var(--dim)} .c-cy{color:var(--cyan)} .c-w{color:var(--warn)}
+.tline{display:flex;gap:6px}
+.tline input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:var(--fg);font:inherit;caret-color:var(--kali)}
+
+/* ---------- SECURITY GAMES ---------- */
+.gamebox{font:12px/1.45 var(--f-mono)} .gamehud{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;color:var(--dim)}
+.gamebtn{padding:6px 10px;border:1px solid var(--line);border-radius:3px;background:var(--void);color:var(--kali);font:12px var(--f-mono)} .gamebtn:hover{border-color:var(--kali)}
+.gamegrid{display:grid;gap:3px;justify-content:center}.cell{width:34px;height:34px;border:1px solid var(--line);background:#07150d;color:var(--fg);font:700 12px var(--f-mono)}.cell:hover{border-color:var(--kali)}.cell.open{background:#0f1c14}.cell.bad{color:var(--err)}.cell.flag{color:var(--warn)}
+.gamecard{border:1px solid var(--line);background:var(--void);padding:12px;border-radius:4px;margin-bottom:10px}.gamecard b{color:var(--kali)}.answer{margin-top:10px;color:var(--dim)}
+.portgrid{display:grid;grid-template-columns:repeat(4,minmax(80px,1fr));gap:6px}.port{padding:12px 6px;border:1px solid var(--line);background:var(--void);border-radius:3px;font:12px var(--f-mono)}.port.hit{border-color:var(--err);color:var(--err)}
+.packetlane{height:220px;position:relative;overflow:hidden;border:1px solid var(--line);background:#010402}.packet{position:absolute;right:-90px;padding:5px 8px;border:1px solid currentColor;border-radius:3px;font:11px var(--f-mono);animation:packetfly 5s linear forwards}.packet.badp{color:var(--err)}.packet.goodp{color:var(--ok)}@keyframes packetfly{to{right:100%}}
+.hackout{height:260px;overflow:hidden;background:#010402;border:1px solid var(--line);padding:10px;color:var(--kali);white-space:pre-wrap;word-break:break-all;font:11px/1.35 var(--f-mono)}
+@media (max-width:640px){
+  .brand,.ws,.hide-sm,.conky{display:none}
+  .win{left:0!important;width:100%!important}
+  #menu{grid-template-columns:1fr}
+  #menu .cats{border-right:0;border-bottom:1px solid var(--line);max-height:30vh}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<!-- GRUB -->
+<div id="grub">
+  <div class="head">GNU GRUB  version 2.12</div>
+  <ul id="grubmenu" role="listbox" aria-label="Boot menu">
+    <li role="option" aria-selected="true">*Kali GNU/Linux</li>
+    <li role="option" aria-selected="false">Advanced options for Kali GNU/Linux</li>
+    <li role="option" aria-selected="false">Kali GNU/Linux (forensic mode, no swap, no automount)</li>
+    <li role="option" aria-selected="false">Memory test (memtest86+)</li>
+  </ul>
+  <div class="foot">Use the ↑ and ↓ keys to select which entry is highlighted.
+Press enter to boot the selected OS, or tap an entry.
+<span id="grubcount">The highlighted entry will be executed automatically in 5s.</span></div>
+</div>
+
+<!-- SYSTEMD -->
+<div id="syslog" hidden><div id="sysout"></div><div class="skip">tap or press any key to skip</div></div>
+
+<!-- LOGIN -->
+<div id="login" hidden>
+  <canvas class="wallpaper" id="wp1"></canvas>
+  <div class="loginmeta"><span>kali</span><span id="loginclock"></span></div>
+  <form class="loginbox" id="loginform" autocomplete="off">
+    <div class="avatar" aria-hidden="true">SD</div>
+    <h1>Sai Praveen Danda</h1>
+    <div class="sub">Cybersecurity Analyst</div>
+    <label for="lpass">Password</label>
+    <input class="field" id="lpass" type="password" placeholder="any password works">
+    <button class="loginbtn" id="loginbtn" type="button">Log In</button>
+    <div class="note">Portfolio login. Nothing you type is stored or sent.</div>
+  </form>
+</div>
+
+<!-- DESKTOP -->
+<div id="panel" hidden>
+  <button class="pbtn" id="menubtn" aria-haspopup="menu" aria-expanded="false">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 14 3.5v4C14 11 11.3 14 8 15 4.7 14 2 11 2 7.5v-4z" fill="#1fe88a"/><path d="M5.5 8 7.3 9.8 10.8 6.2" stroke="#021208" stroke-width="1.6" fill="none"/></svg>
+    <span class="hide-sm">Applications</span>
+  </button>
+  <div class="sep"></div>
+  <div class="ws" aria-label="Workspaces"><button class="on">1</button><button>2</button><button>3</button><button>4</button></div>
+  <div class="sep"></div>
+  <div id="tasks"></div>
+  <div class="tray">
+    <svg viewBox="0 0 16 16" aria-label="Network connected"><path d="M8 12.5a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6zM3.6 9.6a6.2 6.2 0 0 1 8.8 0l-1.2 1.2a4.5 4.5 0 0 0-6.4 0zM1 7a9.9 9.9 0 0 1 14 0l-1.2 1.2a8.2 8.2 0 0 0-11.6 0z"/></svg>
+    <svg class="hide-sm" viewBox="0 0 16 16" aria-label="VPN active"><path d="M8 1 14 3.5v4C14 11 11.3 14 8 15 4.7 14 2 11 2 7.5v-4z"/></svg>
+    <span id="clock"></span>
+  </div>
+</div>
+<div id="menu" hidden role="menu">
+  <div class="search"><input class="field" id="menusearch" placeholder="Search applications…" aria-label="Search applications"></div>
+  <ul class="cats" id="menucats"></ul>
+  <ul class="items" id="menuitems"></ul>
+  <div class="user"><span>sai@kali</span><button class="pbtn" id="logout">Log Out</button></div>
+</div>
+<div id="desktop" hidden>
+  <canvas class="wallpaper" id="wp2"></canvas>
+  <div class="icons" id="icons"></div>
+  <div class="conky" id="conky" aria-hidden="true"></div>
+  <div class="brand glitch"><b>sai@kali</b><span>least privilege · defense in depth · trust but verify</span></div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ===== WALLPAPER (animated code rain) ===== */
+const glyphs='01アイウエオカキクケコサシスセソ0123456789ABCDEF<>{}[]/\\$#%&*+=;:'.split('');
+let rainCv=null,rainCols=[],rainCtx=null,rainFS=16,rainLast=0;
+function paint(cv){
+  rainCv=cv;const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+  cv.width=r.width*dpr;cv.height=r.height*dpr;
+  rainCtx=cv.getContext('2d');rainCtx.setTransform(dpr,0,0,dpr,0,0);
+  rainFS=r.width<640?13:16;
+  const n=Math.ceil(r.width/rainFS);
+  rainCols=Array.from({length:n},()=>({y:Math.random()*-r.height,s:.4+Math.random()*1.1}));
+  rainCtx.fillStyle='#020604';rainCtx.fillRect(0,0,r.width,r.height);
+  if(reduce){ // static frame
+    for(let i=0;i<220;i++)rainFrame(r.width,r.height,true);
+  }
+}
+function rainFrame(W,H,fast){
+  const g=rainCtx;
+  g.fillStyle='rgba(2,6,4,.09)';g.fillRect(0,0,W,H);
+  g.font=`${rainFS}px "Fira Code", monospace`;
+  rainCols.forEach((c,i)=>{
+    const ch=glyphs[(Math.random()*glyphs.length)|0];
+    const x=i*rainFS,y=c.y;
+    g.fillStyle='#d6ffe9';g.shadowColor='#1fe88a';g.shadowBlur=8;
+    g.fillText(ch,x,y);
+    g.shadowBlur=0;g.fillStyle='rgba(31,232,138,.55)';
+    g.fillText(glyphs[(Math.random()*glyphs.length)|0],x,y-rainFS);
+    c.y+=rainFS*c.s;
+    if(c.y>H+Math.random()*400){c.y=Math.random()*-120;c.s=.4+Math.random()*1.1;}
+  });
+}
+function rainLoop(t){
+  requestAnimationFrame(rainLoop);
+  if(reduce||!rainCv||rainCv.closest('[hidden]')||document.hidden)return;
+  if(t-rainLast<55)return;rainLast=t;
+  const r=rainCv.getBoundingClientRect();rainFrame(r.width,r.height);
+}
+requestAnimationFrame(rainLoop);
+addEventListener('resize',()=>{['#wp1','#wp2'].forEach(s=>{const c=$(s);if(!c.closest('[hidden]'))paint(c);});});
+
+/* ===== MONITOR WIDGET ===== */
+const boot0=Date.now();let cpu=22,mem=41,netv=12;const evlog=[];
+const evs=[['ok','[+] tun0 · TLS 1.3 handshake verified'],['ok','[+] suricata: ruleset reloaded'],['w','[!] ssh: 3 failed logins from 203.0.113.7'],['e','[x] fail2ban: banned 203.0.113.7'],['ok','[+] aide: file integrity OK'],['ok','[+] wazuh: agent heartbeat'],['w','[!] nmap SYN scan detected on eth0'],['ok','[+] auditd: policy loaded'],['ok','[+] dns: DNSSEC validation ok'],['w','[!] outbound beacon blocked (nftables)'],['ok','[+] clamav: 0 threats found']];
+function fmtUp(ms){const s=Math.floor(ms/1000);return `${Math.floor(s/3600)}h ${String(Math.floor(s/60)%60).padStart(2,'0')}m ${String(s%60).padStart(2,'0')}s`;}
+function conky(){
+  const el=$('#conky');if(!el||el.closest('[hidden]'))return;
+  const w=(v,d)=>Math.max(4,Math.min(96,v+(Math.random()-.5)*d));
+  cpu=w(cpu,18);mem=w(mem,4);netv=w(netv,14);
+  if(Math.random()<.45){const e=evs[(Math.random()*evs.length)|0];const t=new Date().toLocaleTimeString([], {hour12:false});evlog.unshift([e[0],`${t} ${e[1]}`]);evlog.length=Math.min(evlog.length,7);}
+  el.innerHTML=`<div class="h">SAI@KALI · SECURE NODE</div>
+   <div class="r"><span>uptime</span><b>${fmtUp(Date.now()-boot0)}</b></div>
+   <div class="r"><span>kernel</span><b>6.12.0-kali1</b></div>
+   <div class="r"><span>vpn</span><b class="ok">tun0 up</b></div>
+   <div class="r"><span>cpu</span><b>${cpu.toFixed(0)}%</b></div><div class="meter"><i style="width:${cpu}%"></i></div>
+   <div class="r"><span>mem</span><b>${mem.toFixed(0)}%</b></div><div class="meter"><i style="width:${mem}%"></i></div>
+   <div class="r"><span>net</span><b>${(netv*0.37).toFixed(1)} MB/s</b></div><div class="meter"><i style="width:${netv}%"></i></div>
+   <div class="log">${evlog.map(e=>`<div class="${e[0]}">${esc(e[1])}</div>`).join('')}</div>`;
+}
+setInterval(conky,1200);
+
+/* ===== CLOCKS ===== */
+function tick(){
+  const d=new Date();
+  $('#clock').textContent=d.toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'});
+  $('#loginclock').textContent=d.toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+tick();setInterval(tick,15000);
+
+/* ===== GRUB ===== */
+let gsel=0,gleft=5,gtimer,stage='grub';
+const gitems=[...document.querySelectorAll('#grubmenu li')];
+function gdraw(){gitems.forEach((li,i)=>{li.setAttribute('aria-selected',i===gsel);li.textContent=(i===gsel?'*':' ')+li.textContent.replace(/^[* ]/,'');});}
+function gstop(){clearInterval(gtimer);$('#grubcount').textContent='';}
+gtimer=setInterval(()=>{gleft--;$('#grubcount').textContent=`The highlighted entry will be executed automatically in ${gleft}s.`;if(gleft<=0){gstop();toSyslog();}},1000);
+gitems.forEach((li,i)=>li.addEventListener('click',()=>{gsel=i;gdraw();gstop();toSyslog();}));
+document.addEventListener('keydown',e=>{
+  if(stage==='grub'){
+    if(e.key==='ArrowDown'){gsel=(gsel+1)%gitems.length;gdraw();gstop();e.preventDefault();}
+    else if(e.key==='ArrowUp'){gsel=(gsel+gitems.length-1)%gitems.length;gdraw();gstop();e.preventDefault();}
+    else if(e.key==='Enter'){gstop();toSyslog();}
+  } else if(stage==='syslog'){skipLog=true;}
+});
+
+/* ===== SYSTEMD LOG ===== */
+let skipLog=false;
+const units=[
+ 'Started Journal Service.','Mounted /boot/efi.','Reached target Local File Systems.','Started Load AppArmor profiles.',
+ 'Started Network Time Synchronization.','Reached target System Time Set.','Started D-Bus System Message Bus.',
+ 'Started Network Manager.','Started OpenBSD Secure Shell server.','Started Fail2Ban Service.','Started Suricata IDS/IPS daemon.',
+ 'Started nftables.','Started Wazuh agent.','Started Security Auditing Service (auditd).','Reached target Network is Online.',
+ 'Started Light Display Manager.','Reached target Graphical Interface.'
+];
+async function toSyslog(){
+  if(stage!=='grub')return;stage='syslog';
+  $('#grub').hidden=true;const s=$('#syslog');s.hidden=false;
+  s.addEventListener('click',()=>skipLog=true,{once:true});
+  const out=$('#sysout');
+  const mode=gitems[gsel].textContent.replace(/^[* ]/,'');
+  const add=h=>{const d=document.createElement('div');d.innerHTML=h;out.appendChild(d);if(out.children.length>Math.floor(innerHeight/19)-2)out.firstChild.remove();};
+  add(`Loading Linux 6.12.0-kali1-amd64 ...`);add(`Loading initial ramdisk ...`);
+  if(gsel===3){add('memtest86+: 0 errors. Rebooting into default entry.');}
+  else if(gsel===2){add('<span class="w">Forensic mode: swap disabled, automount disabled.</span>');}
+  await sleep(reduce?0:350);
+  for(const u of units){
+    if(skipLog)break;
+    add(`[<span class="ok">  OK  </span>] ${esc(u)}`);
+    await sleep(reduce?0:90+Math.random()*90);
+  }
+  if(!skipLog)await sleep(400);
+  stage='login';s.hidden=true;$('#login').hidden=false;paint($('#wp1'));$('#lpass').focus();
+}
+
+/* ===== LOGIN ===== */
+function doLogin(e){
+  if(e) e.preventDefault();
+  toDesktop();
+}
+$('#loginform').addEventListener('submit',doLogin);
+$('#loginbtn').addEventListener('click',doLogin);
+$('#lpass').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doLogin(e);}});
+function toDesktop(){
+  if(stage==='desktop')return;
+  stage='desktop';
+  $('#login').hidden=true;
+  $('#panel').hidden=false;
+  $('#desktop').hidden=false;
+  try{paint($('#wp2'));}catch(e){console.warn('Wallpaper init skipped',e);}
+  try{conky();}catch(e){console.warn('Monitor init skipped',e);}
+  try{openApp('about');}catch(e){console.warn('About window init skipped',e);}
+}
+
+/* ===== RESUME DATA ===== */
+const skills=[
+ ['Cybersecurity',[
+   ['SOC & SIEM',['SOC Monitoring','Splunk','ELK','IBM QRadar','Query-based Log Management']],
+   ['Threat Intelligence',['MITRE ATT&CK','VirusTotal','AlienVault OTX']],
+   ['Digital Forensics',['Wireshark','Volatility','Autopsy']],
+   ['Incident Response',['CrowdStrike','Microsoft Defender ATP','Splunk']],
+   ['IDS / IPS',['Snort','Suricata']],
+   ['Vulnerability Management',['Nessus','OpenVAS','Nmap','Burp Suite','Metasploit']],
+   ['Risk & Compliance',['NIST 800-53','ISO 27001','CIS Controls','PCI DSS']],
+   ['Firewalls & Architecture',['Palo Alto NGFW','Cisco Firepower','Zero Trust','Security Automation & Hardening']]]],
+ ['Networking',[
+   ['Core',['TCP/IP','DNS','DHCP','VLANs','Routing & Switching','VPN (IPsec/SSL)']],
+   ['Security & Monitoring',['Palo Alto','Cisco ASA','Cisco Firepower','Packet Analysis','SolarWinds']],
+   ['Resilience',['System Backups & Restoration','Disaster Recovery']]]],
+ ['System Administration',[
+   ['Platforms',['Windows Server 2012 R2–2022','Windows 10/11','Linux (Ubuntu, Kali)','macOS']],
+   ['Identity',['Active Directory','Group Policy','Azure AD','O365 Administration']],
+   ['Operations',['Patch Management','Endpoint Security','VMware','Hyper-V']]]],
+ ['Programming & Tools',[
+   ['Languages',['Python','PowerShell','Bash']],
+   ['Practice',['Secure Coding (OWASP Top 10)','GitHub']],
+   ['Platforms',['Microsoft Azure Security Center','Security Onion','Splunk','IBM QRadar','Nessus','Burp Suite']]]]
+];
+const jobs=[
+ {t:'Cyber Security Risk & Audit Analyst',o:'City of New York, Office of Technology and Innovation',l:'Brooklyn, USA',d:'Feb 2026 – Present',b:[
+  'Conduct risk assessments that analyze threats, vulnerabilities, and business impact to identify and prioritize agency risks.',
+  'Analyze vulnerability and threat intelligence data to identify risk hotspots and support risk-based prioritization.',
+  'Support CIS IG1 implementation, assessing 56 safeguards and identifying security gaps across 100+ NYC agencies.',
+  'Develop risk scoring methodologies and risk registers to evaluate, document, and prioritize cybersecurity risks.',
+  'Evaluate policy exceptions and risk acceptance requests, assessing residual risk and recommending mitigating controls.',
+  'Built a Risk Prioritization Framework using Crown Jewels and critical business functions, scaled across 100+ agencies.']},
+ {t:'Systems Administrator',o:'Inovalon',l:'Hyderabad, India',d:'Jun 2023 – Jul 2024',b:[
+  'Deployed and secured Windows Server environments in line with enterprise security and regulatory standards.',
+  'Managed identity provisioning and privileged access in Active Directory and Azure AD using least privilege.',
+  'Monitored network performance and security logs with SolarWinds and Cisco tools to detect anomalous activity.',
+  'Performed endpoint hardening, patch management, and vulnerability remediation.',
+  'Ran backups, restoration tests, and disaster recovery exercises; supported Tier-3 outage and incident response.']},
+ {t:'Network Support Intern',o:'SRM University',l:'Amaravati, India',d:'Dec 2022 – May 2023',b:[
+  'Configured and maintained Cisco and Palo Alto devices for reliable connectivity and availability.',
+  'Administered Active Directory and Group Policy to control user access and authentication.',
+  'Managed firewall and IDS/IPS configurations with Snort and Suricata to improve threat detection.',
+  'Monitored and troubleshot the network with Wireshark; documented topology and configuration changes.']}
+];
+const linuxTools=[
+ ['Information Gathering',[['nmap','Port scanning and service detection'],['masscan','High-speed port scanner'],['netcat (nc)','Raw TCP/UDP connections and listeners'],['dig / nslookup','DNS queries and record lookups'],['whois','Domain and IP registration data'],['theHarvester','OSINT email and subdomain gathering'],['amass','Attack-surface and subdomain mapping']]],
+ ['Sniffing & Traffic',[['tcpdump','Command-line packet capture'],['Wireshark / tshark','Packet capture and protocol analysis'],['Zeek','Network security monitoring logs'],['ss / netstat','Open sockets and listening ports'],['iftop','Live bandwidth per connection']]],
+ ['Web Application Analysis',[['Burp Suite','Intercepting proxy for web testing'],['OWASP ZAP','Open-source web app scanner'],['nikto','Web server misconfiguration scanner'],['gobuster / ffuf','Directory and parameter fuzzing'],['sqlmap','SQL injection detection and testing'],['wpscan','WordPress vulnerability scanner']]],
+ ['Vulnerability & Exploitation',[['Metasploit','Exploitation and post-exploitation framework'],['searchsploit','Offline Exploit-DB search'],['OpenVAS / GVM','Open-source vulnerability scanning'],['Nessus','Vulnerability assessment scanner']]],
+ ['Password Attacks',[['John the Ripper','Password hash cracking'],['Hashcat','GPU-accelerated hash cracking'],['Hydra','Online login brute-force testing'],['CeWL','Custom wordlist generation']]],
+ ['Forensics & Reversing',[['Volatility','Memory forensics'],['Autopsy / Sleuth Kit','Disk image analysis'],['binwalk','Firmware and embedded file extraction'],['foremost','File carving from raw data'],['ExifTool','File metadata inspection'],['Ghidra','Reverse engineering and disassembly'],['strings / file / xxd','Quick binary triage']]],
+ ['Defense & Hardening',[['iptables / nftables','Kernel packet filtering'],['ufw','Simplified host firewall'],['fail2ban','Bans IPs after repeated failed logins'],['Snort / Suricata','Network intrusion detection and prevention'],['Wazuh / OSSEC','Host intrusion detection and log analysis'],['Lynis','Security auditing and hardening checks'],['auditd','Kernel-level audit logging'],['AIDE','File integrity monitoring'],['rkhunter / chkrootkit','Rootkit detection'],['ClamAV','Antivirus scanning'],['SELinux / AppArmor','Mandatory access control'],['OpenSSL / GnuPG','Certificates, encryption, and signing']]],
+ ['System Administration',[['ssh / scp','Encrypted remote access and file transfer'],['grep / awk / sed','Log searching and text processing'],['journalctl','Systemd log review'],['systemctl','Service management'],['lsof','Open files and the processes holding them'],['ps / top / htop','Process monitoring'],['cron','Scheduled tasks'],['chmod / chown / sudo','Permissions and privilege control'],['tmux','Persistent terminal sessions'],['git','Version control'],['Docker','Containerized tools and labs']]]
+];
+const threats=[
+ ['04:58','c','CRITICAL','RCE in edge VPN appliance','Patch'],
+ ['04:41','h','HIGH','Credential stuffing on SSO portal','Rate-limit'],
+ ['04:22','h','HIGH','Phishing lure: fake invoice .zip','Block sender'],
+ ['03:57','m','MEDIUM','TLS 1.0 still enabled on legacy host','Disable'],
+ ['03:30','m','MEDIUM','Unsigned PowerShell script executed','Investigate'],
+ ['02:12','l','LOW','Port scan from known research range','Log'],
+];
+const chipList=a=>`<div class="chips">${a.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>`;
+const nSkills=skills.reduce((n,s)=>n+s[1].reduce((m,g)=>m+g[1].length,0),0);
+const nTools=linuxTools.reduce((n,c)=>n+c[1].length,0);
+
+/* ===== ICONS ===== */
+const svg=(b)=>`<svg viewBox="0 0 38 38" aria-hidden="true">${b}</svg>`;
+const art={
+ about:svg('<path d="M4 10h11l3 3h16v19H4z" fill="#0e7a47"/><path d="M4 14h30v18H4z" fill="#1fe88a"/><circle cx="19" cy="21" r="3.5" fill="#fff"/><path d="M12.5 30c1-4 3.6-5.3 6.5-5.3s5.5 1.3 6.5 5.3" fill="#fff"/>'),
+ skills:svg('<rect x="5" y="5" width="28" height="28" rx="3" fill="#0f1c14" stroke="#1fe88a"/><rect x="9" y="11" width="20" height="3" rx="1.5" fill="#1fe88a"/><rect x="9" y="17.5" width="14" height="3" rx="1.5" fill="#4fc3e8"/><rect x="9" y="24" width="17" height="3" rx="1.5" fill="#3fc56b"/>'),
+ experience:svg('<rect x="4" y="11" width="30" height="21" rx="2" fill="#0e7a47"/><path d="M13 11V7h12v4" fill="none" stroke="#8ff5c4" stroke-width="2"/><rect x="4" y="18" width="30" height="2" fill="#09552f"/><rect x="16.5" y="16.5" width="5" height="5" rx="1" fill="#e5b53f"/>'),
+ linux:svg('<rect x="3" y="6" width="32" height="26" rx="3" fill="#010402" stroke="#1fe88a"/><path d="M9 14l4 3.5-4 3.5" stroke="#3fc56b" stroke-width="2" fill="none"/><path d="M16 22h6M9 27h18" stroke="#8b93a5" stroke-width="2"/>'),
+ terminal:svg('<rect x="3" y="6" width="32" height="26" rx="3" fill="#010402" stroke="#8b93a5"/><rect x="3" y="6" width="32" height="5" rx="2" fill="#0f1c14"/><path d="M9 17l5 4-5 4" stroke="#e6e6e6" stroke-width="2" fill="none"/><path d="M17 26h9" stroke="#e6e6e6" stroke-width="2"/>'),
+ threats:svg('<path d="M19 4 34 31H4z" fill="#e5b53f"/><rect x="17.5" y="13" width="3" height="10" rx="1" fill="#010402"/><rect x="17.5" y="25" width="3" height="3" rx="1" fill="#010402"/>'),
+ projects:svg('<path d="M4 10h11l3 3h16v19H4z" fill="#8b5a1c"/><path d="M4 14h30v18H4z" fill="#c4842a"/><rect x="15" y="19" width="8" height="7" rx="1" fill="#010402"/><path d="M16.5 19v-2a2.5 2.5 0 0 1 5 0v2" stroke="#010402" stroke-width="1.6" fill="none"/>'),
+ exploit:svg('<rect x="4" y="4" width="30" height="30" rx="3" fill="#07150d" stroke="#1fe88a"/><path d="M11 11h5v5h-5zm11 0h5v5h-5zM11 22h5v5h-5zm11 0h5v5h-5z" fill="#1fe88a"/><path d="M18 18l4 4" stroke="#ef5350" stroke-width="2"/>'),
+ phish:svg('<rect x="4" y="8" width="30" height="22" rx="2" fill="#0f1c14" stroke="#1fe88a"/><path d="M5 10l14 11 14-11" fill="none" stroke="#4fc3e8"/><path d="M28 4v9m0 3v2" stroke="#e5b53f" stroke-width="3"/>'),
+ cracker:svg('<path d="M10 17v-5a9 9 0 0 1 18 0v5" fill="none" stroke="#1fe88a" stroke-width="3"/><rect x="7" y="16" width="24" height="18" rx="3" fill="#0f1c14" stroke="#1fe88a"/><circle cx="19" cy="24" r="2" fill="#e5b53f"/>'),
+ ports:svg('<circle cx="19" cy="19" r="14" fill="#07150d" stroke="#1fe88a"/><path d="M19 7v24M7 19h24M10 11l18 16M28 11L10 27" stroke="#0e7a47"/><circle cx="26" cy="12" r="3" fill="#ef5350"/>'),
+ firewall:svg('<path d="M19 3 33 8v10c0 8-6 14-14 17C11 32 5 26 5 18V8z" fill="#0e7a47" stroke="#1fe88a"/><path d="M10 14h18M10 20h18M14 9v17M23 9v17" stroke="#021208" stroke-width="2"/>'),
+ hacker:svg('<rect x="3" y="6" width="32" height="26" rx="3" fill="#010402" stroke="#1fe88a"/><path d="M8 14l4 3-4 3M15 21h8M8 26h21" stroke="#1fe88a" stroke-width="2" fill="none"/>'),
+ trash:svg('<path d="M10 12h18l-1.6 20H11.6z" fill="#8b93a5"/><rect x="7" y="8" width="24" height="4" rx="1" fill="#c3c9d4"/><path d="M15 16v12M19 16v12M23 16v12" stroke="#0f1c14" stroke-width="1.5"/>')
+};
+
+/* ===== APPS ===== */
+const apps={
+ about:{title:'about-me.txt',w:470,h:420,render:()=>`
+  <div class="wbody about">
+    <h2>Sai Praveen Danda</h2>
+    <div class="role">Cybersecurity Analyst · Cyber Risk &amp; Audit · Security Operations</div>
+    <p>Cybersecurity analyst with experience in cyber risk assessment, security operations, and systems administration across enterprise environments. My work centers on evaluating threats, vulnerabilities, business impact, and security controls to identify and prioritize cybersecurity risk.</p>
+    <p>Open <b>Skills</b>, <b>Experience</b>, or <b>Linux Toolkit</b> from the desktop, or open <b>Terminal</b> and type <code>help</code>.</p>
+    <dl class="kv">
+      <dt>current</dt><dd>Cyber Security Risk &amp; Audit Analyst, NYC Office of Technology and Innovation</dd>
+      <dt>certs</dt><dd>CompTIA Security+ · CompTIA Network+</dd>
+      <dt>education</dt><dd>M.S. Cyber Security, Florida State University<br>Bachelor's in Computer Science, SRM University</dd>
+      <dt>frameworks</dt><dd>NIST 800-53 · CIS Controls · ISO 27001 · PCI DSS · MITRE ATT&amp;CK</dd>
+    </dl>
+  </div>`},
+ skills:{title:'skills — Mousepad',w:580,h:460,render:()=>`
+  <div class="tool-bar"><span>File</span><span>Edit</span><span>View</span></div>
+  <div class="wbody">${skills.map(([cat,groups])=>`<div class="sec"><h3>${cat}</h3>${groups.map(([g,items])=>`<h4>${g}</h4>${chipList(items)}`).join('')}</div>`).join('')}</div>
+  <div class="sbar"><span>${nSkills} skills</span><span>Security+ · Network+</span></div>`},
+ experience:{title:'experience.log',w:600,h:460,render:()=>`
+  <div class="wbody">
+   ${jobs.map(j=>`<div class="job"><div class="jh"><b>${esc(j.t)}</b><span class="meta">${j.d}</span></div><div class="meta">${esc(j.o)} · ${j.l}</div><ul>${j.b.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}
+   <div class="sec"><h3>Certifications</h3>${chipList(['CompTIA Security+','CompTIA Network+'])}</div>
+   <div class="sec"><h3>Education</h3><div>M.S. Cyber Security, Florida State University, Tallahassee<br>Bachelor's in Computer Science, SRM University, Amaravati</div></div>
+  </div>
+  <div class="sbar"><span>${jobs.length} roles</span><span>log integrity: verified</span></div>`},
+ linux:{title:'Linux Toolkit',w:620,h:440,render:()=>`
+  <div class="tabs" role="tablist">${linuxTools.map((c,i)=>`<button class="tab" role="tab" aria-selected="${i===0}" data-i="${i}">${c[0]}</button>`).join('')}</div>
+  <div class="wbody tpane"></div>
+  <div class="sbar"><span>${nTools} tools</span><span>Ubuntu · Kali</span></div>`,
+  init:(el,arg)=>{
+   const pane=el.querySelector('.tpane');
+   el.showTab=i=>{
+     el.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.i==i));
+     pane.innerHTML=linuxTools[i][1].map(([n,d])=>`<div class="tool"><code>${esc(n)}</code><span>${esc(d)}</span></div>`).join('');
+   };
+   el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>el.showTab(+t.dataset.i));
+   el.showTab(arg||0);
+  }},
+ threats:{title:'Threat Monitor',w:600,h:340,render:()=>`
+  <div class="wbody">
+   <p class="example">Sample alerts for display only.</p>
+   <div style="overflow-x:auto"><table class="feed"><thead><tr><th>Time</th><th>Severity</th><th>Event</th><th>Action</th></tr></thead><tbody>
+   ${threats.map(t=>`<tr><td>${t[0]}</td><td><span class="sev ${t[1]}">${t[2]}</span></td><td>${t[3]}</td><td>${t[4]}</td></tr>`).join('')}
+   </tbody></table></div>
+  </div>
+  <div class="sbar"><span>${threats.length} events</span><span>1 critical</span><span>sensor ok</span></div>`},
+ projects:{title:'~/projects — Thunar',w:440,h:280,render:()=>`
+  <div class="wbody"><div class="empty">This folder is empty.<br>Projects will be listed here.</div></div>
+  <div class="sbar"><span>0 items</span><span>LUKS encrypted</span></div>`},
+ exploit:{title:'Exploit Sweeper',w:520,h:500,render:()=>`<div class="wbody gamebox"><div class="gamehud"><span>Find infected hosts. Right-click to deploy firewall rules.</span><button class="gamebtn reset">Reset</button></div><div class="gamegrid sweep"></div><div class="answer msg">network ready</div></div>`,init:el=>{const g=el.querySelector('.sweep'),msg=el.querySelector('.msg');let mines=new Set(),open=new Set(),flags=new Set();function reset(){mines=new Set();open=new Set();flags=new Set();while(mines.size<10)mines.add((Math.random()*64)|0);draw();msg.textContent='network ready · 10 infected hosts';}function draw(){g.style.gridTemplateColumns='repeat(8,34px)';g.innerHTML='';for(let i=0;i<64;i++){let b=document.createElement('button');b.className='cell'+(open.has(i)?' open':'')+(flags.has(i)?' flag':'');if(open.has(i)){if(mines.has(i)){b.textContent='☠';b.classList.add('bad')}else{let n=0,x=i%8,y=(i/8)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){let nx=x+dx,ny=y+dy,j=ny*8+nx;if(nx>=0&&nx<8&&ny>=0&&ny<8&&mines.has(j))n++}b.textContent=n||''}}else b.textContent=flags.has(i)?'⚑':'';b.onclick=()=>{if(flags.has(i))return;if(mines.has(i)){open.add(i);draw();msg.textContent='host compromised — incident detected'}else{open.add(i);draw();if(open.size===54)msg.textContent='network clean — all infected hosts isolated'}};b.oncontextmenu=e=>{e.preventDefault();if(!open.has(i)){flags.has(i)?flags.delete(i):flags.add(i);draw()}};g.appendChild(b)}}el.querySelector('.reset').onclick=reset;reset();}},
+ phish:{title:'Phish or Legit',w:560,h:430,render:()=>`<div class="wbody gamebox"><div class="gamehud"><span>Inspect the message and classify it.</span><span class="score">0/0</span></div><div class="gamecard mail"></div><div style="display:flex;gap:8px"><button class="gamebtn legit">LEGIT</button><button class="gamebtn phishing">PHISH</button><button class="gamebtn next">Next</button></div><div class="answer msg"></div></div>`,init:el=>{const q=[{from:'Microsoft Security <security@micros0ft-support.com>',sub:'Urgent: password expires today',body:'Verify your account immediately at the link below to avoid suspension.',p:1,why:'Phishing: lookalike domain, urgency, and an account-verification lure.'},{from:'IT Service Desk <helpdesk@company.example>',sub:'Scheduled maintenance tonight',body:'VPN access may be interrupted from 11 PM–12 AM. No action is required.',p:0,why:'Legit sample: expected service notice, no credential request, and no urgent action.'},{from:'Payroll <payroll@company-payments.example>',sub:'Direct deposit failed',body:'Open the attached form and confirm your banking credentials within 30 minutes.',p:1,why:'Phishing: urgency plus a request for sensitive banking credentials.'}];let i=0,s=0,n=0;const mail=el.querySelector('.mail'),msg=el.querySelector('.msg'),score=el.querySelector('.score');function show(){let x=q[i];mail.innerHTML=`<b>From:</b> ${esc(x.from)}<br><b>Subject:</b> ${esc(x.sub)}<hr style="border-color:var(--line)">${esc(x.body)}`;msg.textContent='';}function ans(v){n++;if(v===q[i].p){s++;msg.textContent='Correct. '+q[i].why}else msg.textContent='Not quite. '+q[i].why;score.textContent=s+'/'+n}el.querySelector('.legit').onclick=()=>ans(0);el.querySelector('.phishing').onclick=()=>ans(1);el.querySelector('.next').onclick=()=>{i=(i+1)%q.length;show()};show();}},
+ cracker:{title:'Password Cracker',w:500,h:430,render:()=>`<div class="wbody gamebox"><p class="example">Crack the hidden 4-digit access code. Feedback shows exact-position matches and correct digits in the wrong position.</p><div class="gamecard"><input class="field guess" maxlength="4" inputmode="numeric" placeholder="0000"><button class="gamebtn go" style="margin-top:8px">Attempt</button></div><pre class="note log"></pre></div>`,init:el=>{let secret=String((Math.random()*10000)|0).padStart(4,'0'),tries=0;const inp=el.querySelector('.guess'),log=el.querySelector('.log');el.querySelector('.go').onclick=()=>{let v=inp.value.replace(/\D/g,'').slice(0,4);if(v.length<4)return;tries++;let exact=0,sc={},gc={};for(let i=0;i<4;i++){if(v[i]===secret[i])exact++;sc[secret[i]]=(sc[secret[i]]||0)+1;gc[v[i]]=(gc[v[i]]||0)+1}let common=Object.keys(gc).reduce((a,k)=>a+Math.min(gc[k],sc[k]||0),0);log.textContent+=`#${tries} ${v}  exact:${exact}  misplaced:${common-exact}\n`;if(exact===4){log.textContent+=`ACCESS GRANTED in ${tries} attempts\n`;secret=String((Math.random()*10000)|0).padStart(4,'0')}inp.value='';};}},
+ ports:{title:'Port Scanner Hunt',w:560,h:430,render:()=>`<div class="wbody gamebox"><div class="gamehud"><span>Find vulnerable open services.</span><span class="timer">30s</span></div><div class="portgrid"></div><div class="answer msg">Scan started.</div></div>`,init:el=>{const ports=[[22,'SSH'],[25,'SMTP'],[53,'DNS'],[80,'HTTP'],[110,'POP3'],[139,'NetBIOS'],[443,'HTTPS'],[445,'SMB'],[1433,'MSSQL'],[3306,'MySQL'],[3389,'RDP'],[8080,'HTTP-alt']];let vuln=new Set([22,445,3389]),found=new Set(),left=30;const grid=el.querySelector('.portgrid'),timer=el.querySelector('.timer'),msg=el.querySelector('.msg');ports.forEach(([p,n])=>{let b=document.createElement('button');b.className='port';b.innerHTML=`${p}<br><span class="meta">${n}</span>`;b.onclick=()=>{if(vuln.has(p)){found.add(p);b.classList.add('hit');msg.textContent=`${p}/${n}: exposed service found`;if(found.size===vuln.size)msg.textContent='All vulnerable services identified.'}else msg.textContent=`${p}/${n}: service not flagged vulnerable`;};grid.appendChild(b)});let t=setInterval(()=>{if(el.closest('body')===null)return clearInterval(t);left--;timer.textContent=left+'s';if(left<=0){clearInterval(t);msg.textContent=`Scan ended · ${found.size}/${vuln.size} vulnerable services found`;grid.querySelectorAll('button').forEach(b=>b.disabled=true)}},1000);}},
+ firewall:{title:'Firewall Defender',w:620,h:430,render:()=>`<div class="wbody gamebox"><div class="gamehud"><span>Block malicious packets. Let legitimate traffic reach the server.</span><span class="score">score 0</span></div><div class="packetlane"></div></div>`,init:el=>{const lane=el.querySelector('.packetlane'),score=el.querySelector('.score');let s=0,alive=true;function spawn(){if(!alive||!el.isConnected)return;let bad=Math.random()<.48,p=document.createElement('button');p.className='packet '+(bad?'badp':'goodp');p.textContent=bad?'MALICIOUS':'LEGIT';p.style.top=(10+Math.random()*175)+'px';p.style.animationDuration=(3+Math.random()*2)+'s';p.onclick=()=>{s+=bad?10:-5;score.textContent='score '+s;p.remove()};p.addEventListener('animationend',()=>{s+=bad?-10:5;score.textContent='score '+s;p.remove()});lane.appendChild(p);setTimeout(spawn,650)}spawn();}},
+ hacker:{title:'Hacker Typer',w:620,h:420,render:()=>`<div class="wbody gamebox"><p class="example">Type anything. The terminal will stream simulated security-console output.</p><div class="hackout" tabindex="0"></div></div>`,init:el=>{const o=el.querySelector('.hackout'),lines=['[+] initializing packet capture...','[+] loading threat signatures...','[*] enumerating services: 22/tcp 443/tcp 8080/tcp','[+] TLS fingerprint matched','[*] analyzing auth logs...','[!] repeated login failures detected','[+] firewall rule staged','[+] integrity check: verified','[*] correlating indicators with ATT&CK techniques','[+] session complete'];let n=0;o.focus();el.addEventListener('keydown',e=>{if(['Tab','Escape'].includes(e.key))return;e.preventDefault();for(let j=0;j<2;j++)o.textContent+=lines[n++%lines.length]+'\n';o.scrollTop=o.scrollHeight;});}},
+ trash:{title:'Trash',w:400,h:250,render:()=>`
+  <div class="wbody"><pre class="note">passwords.txt        shredded (shred -n 7)
+admin_admin.cfg      shredded (shred -n 7)
+old_firewall.rules   shredded (shred -n 7)</pre></div>
+  <div class="sbar"><span>3 items securely deleted</span></div>`},
+ terminal:{title:'sai@kali: ~',w:640,h:400,term:true}
+};
+const desktopIcons=[['about','about-me.txt'],['skills','Skills'],['experience','Experience'],['linux','Linux Toolkit'],['terminal','Terminal'],['threats','Threat Monitor'],['projects','Projects'],['exploit','Exploit Sweeper'],['phish','Phish or Legit'],['cracker','Password Cracker'],['ports','Port Scanner Hunt'],['firewall','Firewall Defender'],['hacker','Hacker Typer'],['trash','Trash']];
+
+/* desktop icons */
+desktopIcons.forEach(([id,label])=>{
+  const b=document.createElement('button');
+  b.className='ico';b.innerHTML=art[id]+`<span>${label}</span>`;
+  b.addEventListener('dblclick',()=>openApp(id));
+  b.addEventListener('click',()=>{document.querySelectorAll('.ico').forEach(i=>i.classList.remove('sel'));b.classList.add('sel');if(matchMedia('(pointer:coarse)').matches)openApp(id);});
+  b.addEventListener('keydown',e=>{if(e.key==='Enter')openApp(id);});
+  $('#icons').appendChild(b);
+});
+
+/* ===== APPLICATIONS MENU ===== */
+const favs=[['about','about-me.txt'],['skills','Skills'],['experience','Experience'],['terminal','Terminal Emulator'],['threats','Threat Monitor'],['projects','Projects']];
+const cats=[['★','Favorites',null],...linuxTools.map((c,i)=>[String(i+1).padStart(2,'0'),c[0],i])];
+let curCat=0;
+function drawCats(){
+  $('#menucats').innerHTML=cats.map((c,i)=>`<li><button data-i="${i}" class="${i===curCat?'on':''}"><span class="num">${c[0]}</span>${c[1]}</button></li>`).join('');
+  $('#menucats').querySelectorAll('button').forEach(b=>{b.onmouseenter=b.onclick=()=>{curCat=+b.dataset.i;$('#menusearch').value='';drawCats();drawItems();};});
+}
+function drawItems(q){
+  let list;
+  if(q){
+    q=q.toLowerCase();
+    list=[...favs.filter(f=>f[1].toLowerCase().includes(q)).map(f=>({l:f[1],d:'',a:()=>openApp(f[0])})),
+      ...linuxTools.flatMap((c,ci)=>c[1].filter(t=>(t[0]+t[1]).toLowerCase().includes(q)).map(t=>({l:t[0],d:t[1],a:()=>openApp('linux',ci)})))];
+  } else if(cats[curCat][2]===null){
+    list=favs.map(f=>({l:f[1],d:'',a:()=>openApp(f[0])}));
+  } else {
+    const ci=cats[curCat][2];
+    list=linuxTools[ci][1].map(t=>({l:t[0],d:t[1],a:()=>openApp('linux',ci)}));
+  }
+  const ul=$('#menuitems');
+  ul.innerHTML=list.length?list.map((x,i)=>`<li><button data-i="${i}">${esc(x.l)}<span class="d">${esc(x.d)}</span></button></li>`).join(''):'<li class="empty">No matches</li>';
+  ul.querySelectorAll('button').forEach(b=>b.onclick=()=>{toggleMenu(false);list[+b.dataset.i].a();});
+}
+function toggleMenu(force){
+  const m=$('#menu'),open=force??m.hidden;
+  m.hidden=!open;$('#menubtn').classList.toggle('on',open);$('#menubtn').setAttribute('aria-expanded',open);
+  if(open){drawCats();drawItems();if(!matchMedia('(pointer:coarse)').matches)$('#menusearch').focus();}
+}
+$('#menubtn').addEventListener('click',e=>{e.stopPropagation();toggleMenu();});
+$('#menusearch').addEventListener('input',e=>drawItems(e.target.value.trim()));
+document.addEventListener('click',e=>{if(!e.target.closest('#menu'))toggleMenu(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleMenu(false);});
+$('#logout').addEventListener('click',logout);
+document.querySelectorAll('.ws button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ws button').forEach(x=>x.classList.toggle('on',x===b));});
+
+/* ===== WINDOW MANAGER ===== */
+const ico={min:'<svg viewBox="0 0 10 10"><path d="M1 7h8"/></svg>',max:'<svg viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7"/></svg>',x:'<svg viewBox="0 0 10 10"><path d="M2 2l6 6M8 2l-6 6"/></svg>'};
+const wins={};let z=10,off=0;
+function openApp(id,arg){
+  if(wins[id]){wins[id].el.hidden=false;if(arg!=null&&wins[id].el.showTab)wins[id].el.showTab(arg);focusWin(id);return;}
+  const a=apps[id],d=$('#desktop');
+  const W=d.clientWidth,H=d.clientHeight;
+  const w=Math.min(a.w,W),h=Math.min(a.h,H-8);
+  const x=Math.max(0,Math.min(120+off,W-w)),y=Math.max(4,Math.min(24+off,H-h-4));
+  off=(off+30)%150;
+  const el=document.createElement('div');el.className='win';
+  Object.assign(el.style,{width:w+'px',height:h+'px',left:x+'px',top:y+'px'});
+  el.innerHTML=`<div class="tb">${art[id].replace('<svg','<svg class="ti"')}<span class="t">${a.title}</span>
+    <button class="wb" data-a="min" aria-label="Minimize">${ico.min}</button>
+    <button class="wb" data-a="max" aria-label="Maximize">${ico.max}</button>
+    <button class="wb x" data-a="close" aria-label="Close">${ico.x}</button></div>`+(a.term?termMarkup():a.render());
+  d.appendChild(el);
+  const task=document.createElement('button');task.className='task';task.textContent=a.title;
+  task.onclick=()=>{const w=wins[id];if(!w.el.hidden&&!w.el.classList.contains('inactive')){w.el.hidden=true;task.classList.remove('on');}else{w.el.hidden=false;focusWin(id);}};
+  $('#tasks').appendChild(task);
+  wins[id]={el,task,max:false,prev:null};
+  el.addEventListener('pointerdown',()=>focusWin(id));
+  el.querySelector('[data-a=close]').onclick=e=>{e.stopPropagation();el.remove();task.remove();delete wins[id];};
+  el.querySelector('[data-a=min]').onclick=e=>{e.stopPropagation();el.hidden=true;task.classList.remove('on');};
+  el.querySelector('[data-a=max]').onclick=e=>{e.stopPropagation();toggleMax(id);};
+  el.querySelector('.tb').addEventListener('dblclick',()=>toggleMax(id));
+  drag(el,id);
+  if(a.term)initTerm(el);
+  if(a.init)a.init(el,arg);
+  focusWin(id);
+}
+function focusWin(id){
+  Object.entries(wins).forEach(([k,w])=>{const on=k===id;w.el.classList.toggle('inactive',!on);w.task.classList.toggle('on',on&&!w.el.hidden);});
+  wins[id].el.style.zIndex=++z;
+  const inp=wins[id].el.querySelector('.tline input');if(inp&&!matchMedia('(pointer:coarse)').matches)inp.focus({preventScroll:true});
+}
+function toggleMax(id){
+  const w=wins[id],s=w.el.style;
+  if(!w.max){w.prev={l:s.left,t:s.top,w:s.width,h:s.height};Object.assign(s,{left:'0',top:'0',width:'100%',height:'100%',borderRadius:'0'});}
+  else Object.assign(s,{left:w.prev.l,top:w.prev.t,width:w.prev.w,height:w.prev.h,borderRadius:''});
+  w.max=!w.max;
+}
+function drag(el,id){
+  const bar=el.querySelector('.tb');
+  bar.addEventListener('pointerdown',e=>{
+    if(e.target.closest('.wb')||wins[id].max)return;
+    const sx=e.clientX,sy=e.clientY,ox=el.offsetLeft,oy=el.offsetTop,d=$('#desktop');
+    bar.setPointerCapture(e.pointerId);
+    const mv=ev=>{
+      el.style.left=Math.max(-el.offsetWidth+90,Math.min(d.clientWidth-90,ox+ev.clientX-sx))+'px';
+      el.style.top=Math.max(0,Math.min(d.clientHeight-30,oy+ev.clientY-sy))+'px';
+    };
+    const up=()=>{bar.removeEventListener('pointermove',mv);bar.removeEventListener('pointerup',up);};
+    bar.addEventListener('pointermove',mv);bar.addEventListener('pointerup',up);
+  });
+}
+
+/* ===== TERMINAL (zsh, Kali prompt) ===== */
+const promptHTML=(dir)=>`<span class="p1">┌──(</span><span class="pu">sai㉿kali</span><span class="p1">)-[</span><span class="pd">${esc(dir)}</span><span class="p1">]</span>`;
+function termMarkup(){return `<div class="term"><div class="out"></div><div class="pl">${promptHTML('~')}</div><div class="tline"><span class="p1">└─</span><span class="ps">$</span><input aria-label="Terminal command" spellcheck="false" autocomplete="off" autocapitalize="off"></div></div>`;}
+const files={'about-me.txt':'about','skills.txt':'skills','experience.log':'experience','toolkit.md':'linux'};
+function initTerm(el){
+  const out=el.querySelector('.out'),inp=el.querySelector('input'),box=el.querySelector('.term'),pl=el.querySelector('.pl');
+  let cwd='~';const hist=[];let hi=0;
+  const print=(t,c)=>{const d=document.createElement('div');if(c)d.className=c;d.textContent=t;out.appendChild(d);box.scrollTop=box.scrollHeight;};
+  const html=h=>{const d=document.createElement('div');d.innerHTML=h;out.appendChild(d);box.scrollTop=box.scrollHeight;};
+  print('Welcome. Type "help" to list available commands.','c-dim');print('');
+  const cmds={
+    help:()=>[
+      ['Portfolio','c-cy'],'  whoami        who I am','  cat <file>    print a file (try: ls)','  skills        skill areas from my resume','  experience    work history','  certs         certifications','  tools         Linux security toolkit','  open <app>    about | skills | experience | linux | threats | projects',
+      ['System','c-cy'],'  ls  pwd  cd  uname -a  neofetch  date  history  clear  exit',
+      ['Demo','c-cy'],'  nmap <host>   simulated scan of localhost','  sha256sum <text>  hash a string','  sudo su       try it'],
+    whoami:()=>['sai','Sai Praveen Danda · Cybersecurity Analyst · Cyber Risk & Audit'],
+    ls:(a)=>{if(cwd!=='~'&&cwd!=='~/projects')return[];return cwd==='~/projects'?[['(empty)','c-dim']]:[[`about-me.txt  experience.log  skills.txt  toolkit.md  `,''],['projects/','c-cy']];},
+    pwd:()=>[cwd.replace('~','/home/sai')],
+    cd:(a)=>{const t=a[0]||'~';if(t==='~'||t==='..'||t==='/home/sai'){cwd='~';}else if(t==='projects'||t==='projects/'||t==='~/projects'){cwd='~/projects';}else return[[`cd: no such file or directory: ${t}`,'c-er']];pl.innerHTML=promptHTML(cwd);return[];},
+    cat:(a)=>{
+      const f=(a[0]||'').replace(/^\.\//,'');
+      if(!f)return[['cat: missing file operand','c-er']];
+      if(f==='about-me.txt')return['Sai Praveen Danda','Cybersecurity Analyst · Security+ · Network+','','Cyber risk assessment, security operations, and systems administration','across enterprise environments. Focus: threats, vulnerabilities, business','impact, and security controls to identify and prioritize risk.'];
+      if(f==='skills.txt')return cmds.skills();
+      if(f==='experience.log')return cmds.experience();
+      if(f==='toolkit.md')return cmds.tools();
+      return[[`cat: ${f}: No such file or directory`,'c-er']];
+    },
+    skills:()=>skills.flatMap(([c,g])=>[[c,'c-cy'],...g.map(([n,i])=>`  ${n.padEnd(26)}${i.join(', ')}`)]),
+    experience:()=>jobs.flatMap(j=>[[`${j.d.padEnd(20)}${j.t}`,'c-ok'],`${''.padEnd(20)}${j.o}`]),
+    certs:()=>['CompTIA Security+','CompTIA Network+'],
+    tools:()=>{openApp('linux');return linuxTools.map(([c,t],i)=>`${String(i+1).padStart(2,'0')} ${c.padEnd(30)}${t.map(x=>x[0].split(' ')[0]).join(' ')}`);},
+    open:(a)=>{const id=(a[0]||'').toLowerCase();if(apps[id]&&id!=='terminal'){openApp(id);return[`opening ${id}…`];}return[['usage: open about|skills|experience|linux|threats|projects','c-er']];},
+    uname:(a)=>[a[0]==='-a'?'Linux kali 6.12.0-kali1-amd64 #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux':'Linux'],
+    date:()=>[new Date().toString()],
+    history:()=>hist.map((h,i)=>`${String(i+1).padStart(5)}  ${h}`),
+    clear:()=>{out.innerHTML='';return[];},
+    exit:()=>{const id='terminal';wins[id].el.querySelector('[data-a=close]').click();return[];},
+    neofetch:()=>{
+      const L=['  ╔══════════╗','  ║  ▄▄  ▄▄  ║','  ║  ██▄▄██  ║','  ║   ▀██▀   ║','  ║    ██    ║','  ╚══════════╝','','',''];
+      const R=[['sai@kali','c-cy'],'--------',`OS: Kali GNU/Linux Rolling x86_64`,`Kernel: 6.12.0-kali1-amd64`,`Shell: zsh 5.9`,`DE: Xfce 4.20`,`Role: Cybersecurity Analyst`,`Certs: Security+, Network+`,`Skills: ${nSkills} loaded · Tools: ${nTools}`];
+      R.forEach((r,i)=>{const t=Array.isArray(r)?r[0]:r,c=Array.isArray(r)?r[1]:'';html(`<span class="p1">${esc((L[i]||'').padEnd(16))}</span><span class="${c}">${esc(t)}</span>`);});
+      return[];
+    },
+    sudo:(a)=>[[`[sudo] password for sai: `,''],['Sorry, visitor accounts are not in the sudoers file. This incident will be reported.','c-er']],
+    nmap:async(a)=>{
+      const host=a.filter(x=>!x.startsWith('-')).pop();
+      if(!host)return[['usage: nmap <host>   (try: nmap localhost)','c-w']];
+      if(!['localhost','127.0.0.1','kali'].includes(host))return[['This demo only scans localhost. Scanning hosts you do not own is illegal.','c-w']];
+      const steps=[`Starting Nmap 7.95 ( https://nmap.org )`,`Nmap scan report for localhost (127.0.0.1)`,`Host is up (0.000041s latency).`,`Not shown: 996 closed tcp ports (reset)`,['PORT     STATE    SERVICE  VERSION','c-cy'],'22/tcp   open     ssh      OpenSSH 9.9p1 (key auth only)','443/tcp  open     https    nginx 1.26 (TLS 1.3)','1514/tcp open     wazuh    Wazuh agent','3389/tcp filtered rdp',``,['Nmap done: 1 IP address (1 host up) scanned in 0.42 seconds','c-ok']];
+      for(const s of steps){Array.isArray(s)?print(s[0],s[1]):print(s);await sleep(reduce?0:160);}return[];
+    },
+    sha256sum:async(a)=>{
+      const t=a.join(' ');if(!t)return[['usage: sha256sum <text>','c-w']];
+      try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')+'  -'];}
+      catch{return[['sha256sum: hashing is unavailable in this browser','c-er']];}
+    }
+  };
+  cmds.ll=cmds.ls;cmds.hash=cmds.sha256sum;cmds.fastfetch=cmds.neofetch;
+  const echo=raw=>{html(promptHTML(cwd));html(`<span class="p1">└─</span><span class="ps">$</span> ${esc(raw)}`);};
+  inp.addEventListener('keydown',async e=>{
+    if(e.key==='ArrowUp'){if(hi>0){hi--;inp.value=hist[hi];}e.preventDefault();return;}
+    if(e.key==='ArrowDown'){if(hi<hist.length-1){hi++;inp.value=hist[hi];}else{hi=hist.length;inp.value='';}e.preventDefault();return;}
+    if(e.key==='Tab'){e.preventDefault();const v=inp.value;const m=Object.keys(cmds).find(k=>k.startsWith(v)&&v);if(m)inp.value=m+' ';return;}
+    if(e.key!=='Enter')return;
+    const raw=inp.value.trim();inp.value='';echo(raw);
+    if(!raw)return;
+    hist.push(raw);hi=hist.length;
+    let [c,...args]=raw.split(/\s+/);
+    if(c==='sudo'&&args[0]&&args[0]!=='su'&&args[0]!=='-i'){c=args.shift();print('[sudo] permission granted for read-only portfolio commands','c-dim');}
+    const fn=cmds[c.toLowerCase()];
+    if(!fn){print(`zsh: command not found: ${c}`,'c-er');return;}
+    inp.disabled=true;
+    const res=await fn(args);
+    inp.disabled=false;inp.focus({preventScroll:true});
+    res.forEach(r=>Array.isArray(r)?print(r[0],r[1]):print(r));
+  });
+  box.addEventListener('click',()=>{if(!getSelection().toString())inp.focus({preventScroll:true});});
+}
+
+/* ===== LOG OUT ===== */
+function logout(){
+  toggleMenu(false);
+  Object.values(wins).forEach(w=>{w.el.remove();w.task.remove();});
+  for(const k in wins)delete wins[k];
+  $('#panel').hidden=true;$('#desktop').hidden=true;
+  stage='login';$('#lpass').value='';$('#login').hidden=false;paint($('#wp1'));$('#lpass').focus();
+}
+})();
+</script>
+</body>
+</html>
